@@ -37,11 +37,11 @@
   <div class="grid">
    <div class="card"><div class="cardhead"><h2>Prochain grand rendez-vous</h2><span class="pill">Objectif A</span></div><div class="eyebrow">13 DÉCEMBRE 2026</div><div style="font-size:25px;font-weight:850;margin:6px 0">Semi-marathon</div><div class="muted" style="font-size:13px">Cible : <strong style="color:var(--text)">1 h 38 · 4:39/km</strong></div><div class="progressrow"><span>Temps restant</span><strong id="semiCountdown">—</strong></div></div>
    <div class="card"><div class="cardhead"><h2>Zones cardio course</h2><small>Repères indicatifs · à personnaliser</small></div><div class="zones">
-    <div class="zone"><span class="zone-name">Récup.</span><div class="zone-track"><span style="width:55%;background:#6d9c83"></span></div><span class="zone-range">≤ 134 bpm</span></div>
-    <div class="zone"><span class="zone-name">Endurance</span><div class="zone-track"><span style="width:65%;background:#83bd8e"></span></div><span class="zone-range">135–150 bpm</span></div>
-    <div class="zone"><span class="zone-name">Modérée</span><div class="zone-track"><span style="width:75%;background:#d0b66c"></span></div><span class="zone-range">151–163 bpm</span></div>
-    <div class="zone"><span class="zone-name">Seuil</span><div class="zone-track"><span style="width:88%;background:#ed9658"></span></div><span class="zone-range">170–178 bpm</span></div>
-    <div class="zone"><span class="zone-name">Intense</span><div class="zone-track"><span style="width:100%;background:#df6868"></span></div><span class="zone-range">179–199 bpm</span></div>
+    <div class="zone"><span class="zone-name">Récup.</span><div class="zone-track"><span style="width:55%;background:#6d9c83"></span></div><span class="zone-range">à configurer</span></div>
+    <div class="zone"><span class="zone-name">Endurance</span><div class="zone-track"><span style="width:65%;background:#83bd8e"></span></div><span class="zone-range">à configurer</span></div>
+    <div class="zone"><span class="zone-name">Modérée</span><div class="zone-track"><span style="width:75%;background:#d0b66c"></span></div><span class="zone-range">à configurer</span></div>
+    <div class="zone"><span class="zone-name">Seuil</span><div class="zone-track"><span style="width:88%;background:#ed9658"></span></div><span class="zone-range">à configurer</span></div>
+    <div class="zone"><span class="zone-name">Intense</span><div class="zone-track"><span style="width:100%;background:#df6868"></span></div><span class="zone-range">à configurer</span></div>
    </div><p class="notice" style="margin:13px 0 0">Repères indicatifs basés sur tes dernières données connues. À recalibrer si Garmin/Tredict évolue.</p></div>
   </div>
  </div>
@@ -75,7 +75,7 @@
    <div class="goal"><div class="goalrow"><div><div class="goalname">Triathlon XL Gérardmer</div><div class="goaldetail">Objectif longue distance</div></div><span class="goaldate">4 sept. 2027</span></div><div style="font-size:18px;font-weight:850;margin-top:6px">Préparation triathlon</div></div>
    <div class="goal"><div class="goalrow"><div><div class="goalname">IRONMAN full distance</div><div class="goaldetail">Horizon à moyen terme</div></div><span class="goaldate">~2028</span></div><div style="font-size:18px;font-weight:850;margin-top:6px">Construire progressivement</div></div>
   </div>
-  <div class="card"><div class="cardhead"><h2>Ma fiche athlète</h2><small>Modifiable</small></div><form id="profileForm"><div class="formgrid"><div class="field"><label for="pWeight">Poids (kg)</label><input id="pWeight" type="number" step=".1" value="79"></div><div class="field"><label for="pVo2">VO₂max</label><input id="pVo2" type="number" step=".1" value="56.5"></div><div class="field"><label for="pMax">FC max (bpm)</label><input id="pMax" type="number" value="199"></div><div class="field"><label for="pThreshold">FC seuil (bpm)</label><input id="pThreshold" type="number" value="174"></div><div class="field full"><label for="pNotes">Notes / état de forme</label><textarea id="pNotes" placeholder="Fatigue, sommeil, gêne, contexte…"></textarea></div></div><button class="btn primary" type="submit">Enregistrer mon profil</button></form></div>
+  <div class="card"><div class="cardhead"><h2>Ma fiche athlète</h2><small>Modifiable</small></div><form id="profileForm"><div class="formgrid"><div class="field"><label for="pWeight">Poids (kg)</label><input id="pWeight" type="number" step=".1" value=""></div><div class="field"><label for="pVo2">VO₂max</label><input id="pVo2" type="number" step=".1" value=""></div><div class="field"><label for="pMax">FC max (bpm)</label><input id="pMax" type="number" value=""></div><div class="field"><label for="pThreshold">FC seuil (bpm)</label><input id="pThreshold" type="number" value=""></div><div class="field full"><label for="pNotes">Notes / état de forme</label><textarea id="pNotes" placeholder="Fatigue, sommeil, gêne, contexte…"></textarea></div></div><button class="btn primary" type="submit">Enregistrer mon profil</button></form></div>
  </div>
 </section>
 <section class="section" id="journal">
@@ -98,21 +98,15 @@ const KEY='cockpit-endurance-v1';
 const defaultState={
  sessions:[
  {id:'s1',day:1,type:'Récupération',title:'Repos ou mobilité douce',meta:'20 min mobilité si besoin · aucune intensité',done:false},
- {id:'s2',day:2,type:'Course facile',title:'Footing facile',meta:'45–50 min · 5:20–5:55/km · 135–150 bpm',done:false},
+ {id:'s2',day:2,type:'Course facile',title:'Footing facile',meta:'45–50 min · allure et FC à définir',done:false},
  {id:'s3',day:3,type:'Renforcement',title:'Gainage + renforcement général',meta:'25–35 min · contrôle, sans douleur',done:false},
  {id:'s4',day:4,type:'Course',title:'Séance qualité à adapter',meta:'Seulement si jambes fraîches et aucune douleur · sinon footing facile',done:false},
  {id:'s5',day:5,type:'Repos',title:'Repos',meta:'Sommeil, hydratation, récupération',done:false},
  {id:'s6',day:6,type:'Course facile',title:'Footing facile',meta:'40–50 min · 5:20–5:55/km · 135–150 bpm',done:false},
  {id:'s7',day:0,type:'Sortie longue',title:'Sortie longue confortable',meta:'70–85 min facile · 135–150 bpm · raccourcir si fatigue',done:false}
  ],
- activities:[
- {id:'a1',date:'2026-10-27',type:'Course',distance:11.54,duration:58.2,hr:159,rpe:6,title:'Course à pied',notes:'Allure moyenne 5:03/km · FC max 184 bpm'},
- {id:'a2',date:'2026-10-25',type:'Course',distance:14.02,duration:79.6,hr:142,rpe:4,title:'Sortie endurance',notes:'Allure moyenne 5:38/km · FC max 161 bpm'},
- {id:'a3',date:'2026-10-20',type:'Course',distance:11.72,duration:0,hr:161,rpe:6,title:'Course à pied',notes:'Durée non renseignée'},
- {id:'a4',date:'2026-10-18',type:'Course',distance:17.01,duration:0,hr:152,rpe:5,title:'Sortie longue',notes:'Durée non renseignée'},
- {id:'a5',date:'2026-10-16',type:'Course',distance:7.44,duration:0,hr:145,rpe:3,title:'Course facile',notes:'Durée non renseignée'}
- ],
- profile:{weight:79,vo2:56.5,max:199,threshold:174,notes:''}
+ activities:[],
+ profile:{weight:null,vo2:null,max:null,threshold:null,notes:''}
 };
 let state=load();
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.sessions)&&Array.isArray(s.activities))return s}catch(e){}return structuredClone(defaultState)}
