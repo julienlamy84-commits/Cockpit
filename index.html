@@ -95,9 +95,9 @@
 </div><div class="toast" id="toast">Enregistré</div>
 <script>
 const KEY='cockpit-endurance-v1';
-const defaultState={sessions:[],activities:[],profile:{weight:77,vo2:56,max:199,threshold:175,notes:'Seuil actuel : 4:19/km à 175 bpm.'}};
+const defaultState={sessions:[],activities:[],planVersion:2,profile:{weight:77,vo2:56,max:199,threshold:175,notes:'Seuil actuel : 4:19/km à 175 bpm.'}};
 let state=load();
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.sessions)&&Array.isArray(s.activities)){s.profile=s.profile||{};if(s.profile.weight==null)s.profile.weight=77;if(s.profile.vo2==null)s.profile.vo2=56;if(s.profile.max==null)s.profile.max=199;if(s.profile.threshold==null)s.profile.threshold=175;if(s.profile.notes==null)s.profile.notes='Seuil actuel : 4:19/km à 175 bpm.';if(s.sessions.some(x=>!x.week))s.sessions=[];return s}}catch(e){}return structuredClone(defaultState)}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.sessions)&&Array.isArray(s.activities)){s.profile=s.profile||{};if(s.profile.weight==null)s.profile.weight=77;if(s.profile.vo2==null)s.profile.vo2=56;if(s.profile.max==null)s.profile.max=199;if(s.profile.threshold==null)s.profile.threshold=175;if(s.profile.notes==null)s.profile.notes='Seuil actuel : 4:19/km à 175 bpm.';if(s.sessions.some(x=>!x.week))s.sessions=[];if(s.planVersion!==2){const cw=dateISO(monday(new Date()));s.sessions=s.sessions.filter(x=>!(/-(quality|easy|tempo|long|swim)$/.test(x.id))||x.week===cw&&(/-(quality|easy)$/.test(x.id)));s.planVersion=2;}return s}}catch(e){}return structuredClone(defaultState)}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));showToast('Données enregistrées sur cet appareil');render()}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),1800)}
 const days=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
@@ -108,9 +108,56 @@ function weekKey(){const m=monday(new Date());m.setDate(m.getDate()+weekOffset*7
 function fmtDate(s){if(!s)return'—';return new Date(s+'T12:00:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'})}
 function durationFmt(min){if(!min)return'—';const h=Math.floor(min/60),m=Math.round(min%60);return h?h+' h '+String(m).padStart(2,'0')+' min':m+' min'}
 function paceFmt(km,min){if(!km||!min)return'—';const sec=Math.round(min*60/km);return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')+'/km'}
-function createWeekSessions(key){const start=new Date(key+'T12:00:00'),current=monday(new Date()),wi=Math.round((start-current)/604800000),toRace=Math.max(0,Math.floor((new Date('2026-12-13T12:00:00')-start)/604800000)),long=Math.min(115,75+Math.max(0,8-toRace)*5);
-const v=[{q:'8 × 800 m',qm:'Échauffement 15 min à 135–150 bpm + 3 lignes droites · 8 × 800 m, récup. 2 min en trot · retour au calme 10 min. Vise 176–184 bpm en fin de répétition ; ne force pas l’allure pour faire monter la FC.',t:'3 × 8 min',tm:'15 min faciles à 135–150 bpm · 3 × 8 min à 168–175 bpm (récup. 2 min trot) · 10 min faciles. Allure indicative 4:25–4:40/km, FC prioritaire.'},{q:'5 × 1 000 m',qm:'Échauffement 15 min à 135–150 bpm + 3 lignes droites · 5 × 1 000 m, récup. 2 min trot · retour au calme 10 min. Cible 176–184 bpm en fin de bloc ; allure indicative 4:10–4:20/km, FC prioritaire.',t:'2 × 12 min',tm:'15 min faciles à 135–150 bpm · 2 × 12 min à 168–175 bpm (récup. 3 min trot) · 10 min faciles. Allure indicative 4:25–4:40/km, FC prioritaire.'},{q:'6 × 3 min',qm:'Échauffement 15 min à 135–150 bpm + 3 lignes droites · 6 × 3 min à 176–184 bpm, récup. 2 min en trot · retour au calme 10 min. Laisse la FC monter progressivement, sans sprint pour atteindre la cible.',t:'20 min continues',tm:'15 min faciles à 135–150 bpm · 20 min régulières à 168–175 bpm · 10 min faciles. Allure indicative 4:25–4:40/km, FC prioritaire.'}];const x=v[((wi%3)+3)%3];const a=[{id:key+'-quality',week:key,day:2,type:'Fractionné',title:x.q,meta:x.qm,done:false},{id:key+'-easy',week:key,day:4,type:'Endurance facile',title:'Footing facile · 45–55 min',meta:'7–9 km environ · 135–150 bpm du début à la fin · allure libre pour rester dans la zone. Si la FC dérive, ralentis.',done:false},{id:key+'-tempo',week:key,day:6,type:'Seuil / allure semi',title:x.t,meta:x.tm,done:false},{id:key+'-long',week:key,day:0,type:'Sortie longue · '+long+' min',meta:'Environ '+Math.round(long/6.2)+'–'+Math.round(long/5.5)+' km selon allure · 135–150 bpm, régulière et confortable. Raccourcis si fatigue.',done:false}];if(((wi%3)+3)%3===0)a.push({id:key+'-swim',week:key,day:3,type:'Natation',title:'Natation facile · 45 min',meta:'Technique et aisance, sans objectif de performance. Environ une semaine sur trois.',done:false});return a}
-function ensureWeek(key){if(!state.sessions.some(s=>s.week===key))state.sessions.push(...createWeekSessions(key))}
+function createWeekSessions(key){
+ const start=new Date(key+'T12:00:00'),raceMonday=monday(new Date('2026-12-13T12:00:00')),weeksToRace=Math.round((raceMonday-start)/604800000);
+ const easy={title:'Footing facile · 45–50 min',meta:'45–50 min · 135–150 bpm, respiration facile. Pas de chrono à poursuivre.'};
+ let q,t,longTitle,longMeta;
+ if(weeksToRace>=6){
+  q={title:'Fractionné déjà prévu cette semaine',meta:'La séance 8 × 800 m a été faite le mardi : ne rajoute pas d’intensité. 176–184 bpm possible en fin de répétition, sans forcer pour atteindre la FC.'};
+  t={title:'Footing facile + lignes droites',meta:'40–45 min à 135–150 bpm puis 6 × 20 s rapides mais relâchées, récupération complète en marchant/trottinant. Pas un deuxième entraînement dur.'};
+  longTitle='Sortie longue facile · 80–85 min';longMeta='80–85 min à 135–150 bpm, terrain facile et allure régulière. Tu dois finir avec de la marge.';
+ } else if(weeksToRace===5){
+  q={title:'5 × 1 000 m · allure 10 km contrôlée',meta:'Échauffement 15 min à 135–150 bpm + 3 accélérations · 5 × 1 000 m vers 4:10–4:20/km, récupération 2 min en trot · retour au calme 10 min. FC attendue en hausse, souvent 176–184 en fin de répétition ; priorité à la régularité.'};
+  t={title:'2 × 15 min à allure semi',meta:'15 min faciles · 2 × 15 min vers 4:35–4:40/km, récupération 3 min en trot · 10 min faciles. Reste contrôlé, généralement 168–175 bpm ; si la FC dérive, ralentis.'};
+  longTitle='Sortie longue · 90 min';longMeta='90 min à 135–150 bpm, facile du début à la fin. Pas de finish rapide cette semaine.';
+ } else if(weeksToRace===4){
+  q={title:'6 × 800 m · rapide et régulier',meta:'Échauffement 15 min à 135–150 bpm + 3 accélérations · 6 × 800 m vers 4:05–4:15/km, récupération 2 min en trot · retour au calme 10 min. 176–184 bpm peut être atteint en fin de répétition, sans sprint.'};
+  t={title:'3 × 8 min au seuil contrôlé',meta:'15 min faciles · 3 × 8 min vers 4:20–4:30/km, récupération 2 min en trot · 10 min faciles. Vise 168–175 bpm, effort solide mais maîtrisé.'};
+  longTitle='Sortie longue · 95 min';longMeta='95 min à 135–150 bpm, relâchée. Raccourcis de 10–15 min si fatigue ou jambes lourdes.';
+ } else if(weeksToRace===3){
+  q={title:'4 × 1 200 m · endurance de vitesse',meta:'Échauffement 15 min à 135–150 bpm · 4 × 1 200 m vers 4:15–4:22/km, récupération 2 min 30 en trot · retour au calme 10 min. Garde les répétitions homogènes, sans finir à bloc.'};
+  t={title:'25 min au seuil',meta:'15 min faciles · 25 min continues vers 4:25–4:32/km, FC autour de 168–175 bpm · 10 min faciles. Si tu es fatigué, remplace par 45 min faciles.'};
+  longTitle='Sortie longue · 95–100 min';longMeta='95–100 min à 135–150 bpm. Les 15 dernières minutes peuvent monter vers 151–158 bpm uniquement si tu es frais ; sinon reste facile.';
+ } else if(weeksToRace===2){
+  q={title:'3 × 2 km à allure semi',meta:'Échauffement 15 min faciles · 3 × 2 km vers 4:35–4:40/km, récupération 3 min en trot · retour au calme 10 min. Effort spécifique, régulier, sans dépasser le seuil.'};
+  t={title:'Footing facile + lignes droites',meta:'40–45 min à 135–150 bpm puis 5 × 20 s rapides et relâchées, récupération complète. Tu dois finir frais.'};
+  longTitle='Sortie longue allégée · 80–85 min';longMeta='80–85 min faciles à 135–150 bpm, sans accélération finale.';
+ } else if(weeksToRace===1){
+  q={title:'Rappel d’allure · 3 × 1 km',meta:'Échauffement 15 min · 3 × 1 km à allure semi visée, environ 4:39/km, récupération 2 min en trot · retour au calme 10 min. Sensation facile à contrôlée ; pas de recherche de FC haute.'};
+  t={title:'Footing pré-course',meta:'20–25 min très faciles à 135–145 bpm + 4 × 15 s d’accélération relâchée, récupération complète. Arrête-toi avec de bonnes sensations.'};
+  longTitle='Semi-marathon · objectif 1 h 38';longMeta='Dimanche : 21,1 km. Départ prudent, autour de 4:42–4:45/km au début, puis stabilise vers 4:39/km si les sensations et la FC restent maîtrisées. Pas de sprint avant les derniers kilomètres.';
+ } else {
+  const post=-weeksToRace;
+  if(post===0){
+   q={title:'Récupération après semi',meta:'Pas de fractionné cette semaine. Marche ou vélo très facile si tu en as envie, sans objectif.'};
+   t={title:'Footing de récupération',meta:'25–35 min maximum, uniquement si les jambes sont fraîches · rester sous 145 bpm. Sinon repos.'};
+   longTitle='Sortie longue remplacée par récupération';longMeta='Pas de sortie longue cette semaine : récupère du semi, sommeil et alimentation prioritaires.';
+  } else {
+   q={title:'Fartlek contrôlé · 6 × 2 min',meta:'Échauffement 15 min à 135–150 bpm · 6 × 2 min soutenues à RPE 7/10, récupération 2 min faciles · retour au calme 10 min. Accélère progressivement, sans chercher une FC précise.'};
+   t={title:'Endurance + lignes droites',meta:'45–50 min à 135–150 bpm puis 6 × 20 s relâchées, récupération complète.'};
+   longTitle='Sortie longue facile · '+Math.min(105,75+post*5)+' min';longMeta=Math.min(105,75+post*5)+' min à 135–150 bpm, allure confortable. La préparation marathon se construit progressivement, sans hausse brutale du volume.';
+  }
+ }
+ const a=[
+  {id:key+'-quality',week:key,day:2,type:'Fractionné / spécifique',title:q.title,meta:q.meta,done:false},
+  {id:key+'-easy',week:key,day:4,type:'Endurance facile',title:easy.title,meta:easy.meta,done:false},
+  {id:key+'-tempo',week:key,day:6,type:'Allure spécifique / contrôle',title:t.title,meta:t.meta,done:false},
+  {id:key+'-long',week:key,day:0,type:weeksToRace===1?'Course objectif':'Sortie longue',title:longTitle,meta:longMeta,done:false}
+ ];
+ if(((Math.abs(weeksToRace)%3)===0)&&weeksToRace!==1&&weeksToRace>0)a.push({id:key+'-swim',week:key,day:3,type:'Natation',title:'Natation facile · 45 min',meta:'Technique et aisance, sans objectif de performance. Séance courte, environ une fois toutes les 2–3 semaines.',done:false});
+ return a;
+}
+function ensureWeek(key){const generated=createWeekSessions(key);for(const s of generated)if(!state.sessions.some(x=>x.id===s.id))state.sessions.push(s);}
 function currentWeekSessions(){const key=weekKey();ensureWeek(key);return state.sessions.filter(s=>s.week===key).sort((a,b)=>((a.day+6)%7)-((b.day+6)%7))}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function sessionHTML(s){const d=new Date((s.week||weekKey())+'T12:00:00');d.setDate(d.getDate()+((s.day+6)%7));return '<div class="session"><input class="check session-check" type="checkbox" data-id="'+esc(s.id)+'" '+(s.done?'checked':'')+' aria-label="Séance terminée"><div class="sessionbody"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="pill '+(/repos|récup/i.test(s.type)?'rest':/facile|endurance/i.test(s.type)?'easy':'')+'">'+esc(s.type)+'</span><span class="sessiontitle">'+esc(s.title)+'</span></div><div class="sessionmeta">'+days[s.day]+' '+d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})+' · '+esc(s.meta||'Détails à préciser')+'</div></div><button class="btn" style="padding:5px 9px" data-delete-session="'+esc(s.id)+'" aria-label="Supprimer la séance">×</button></div>'}
