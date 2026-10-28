@@ -95,9 +95,9 @@
 </div><div class="toast" id="toast">Enregistré</div>
 <script>
 const KEY='cockpit-endurance-v1';
-const defaultState={sessions:[],activities:[],planVersion:3,profile:{weight:77,vo2:56,max:199,threshold:175,notes:'Seuil actuel : 4:19/km à 175 bpm.'}};
+const defaultState={sessions:[],activities:[],planVersion:4,profile:{weight:77,vo2:56,max:199,threshold:175,notes:'Seuil actuel : 4:19/km à 175 bpm.'}};
 let state=load();
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.sessions)&&Array.isArray(s.activities)){s.profile=s.profile||{};if(s.profile.weight==null)s.profile.weight=77;if(s.profile.vo2==null)s.profile.vo2=56;if(s.profile.max==null)s.profile.max=199;if(s.profile.threshold==null)s.profile.threshold=175;if(s.profile.notes==null)s.profile.notes='Seuil actuel : 4:19/km à 175 bpm.';if(s.sessions.some(x=>!x.week))s.sessions=[];if(s.planVersion!==3){const cw=dateISO(monday(new Date()));s.sessions=s.sessions.filter(x=>!(/-(quality|easy|tempo|long|swim)$/.test(x.id))||x.week===cw&&(/-(quality|easy)$/.test(x.id)));s.planVersion=2;}return s}}catch(e){}return structuredClone(defaultState)}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.sessions)&&Array.isArray(s.activities)){s.profile=s.profile||{};if(s.profile.weight==null)s.profile.weight=77;if(s.profile.vo2==null)s.profile.vo2=56;if(s.profile.max==null)s.profile.max=199;if(s.profile.threshold==null)s.profile.threshold=175;if(s.profile.notes==null)s.profile.notes='Seuil actuel : 4:19/km à 175 bpm.';if(s.sessions.some(x=>!x.week))s.sessions=[];if(s.planVersion!==4){const cw=dateISO(monday(new Date()));s.sessions=s.sessions.filter(x=>!(/-(quality|easy|tempo|long|swim)$/.test(x.id))||x.done||x.week===cw&&/-quality$/.test(x.id));s.planVersion=2;}return s}}catch(e){}return structuredClone(defaultState)}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));showToast('Données enregistrées sur cet appareil');render()}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),1800)}
 const days=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
