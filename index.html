@@ -95,9 +95,9 @@
 </div><div class="toast" id="toast">Enregistré</div>
 <script>
 const KEY='cockpit-endurance-v1';
-const defaultState={sessions:[],activities:[],planVersion:4,profile:{weight:77,vo2:56,max:199,threshold:175,notes:'Seuil actuel : 4:19/km à 175 bpm.'}};
+const defaultState={sessions:[],activities:[],planVersion:5,profile:{weight:77,vo2:56,max:199,threshold:175,notes:'Seuil actuel : 4:19/km à 175 bpm.'}};
 let state=load();
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.sessions)&&Array.isArray(s.activities)){s.profile=s.profile||{};if(s.profile.weight==null)s.profile.weight=77;if(s.profile.vo2==null)s.profile.vo2=56;if(s.profile.max==null)s.profile.max=199;if(s.profile.threshold==null)s.profile.threshold=175;if(s.profile.notes==null)s.profile.notes='Seuil actuel : 4:19/km à 175 bpm.';if(s.sessions.some(x=>!x.week))s.sessions=[];if(s.planVersion!==4){const cw=dateISO(monday(new Date()));s.sessions=s.sessions.filter(x=>!(/-(quality|easy|tempo|long|swim)$/.test(x.id))||x.done||x.week===cw&&/-quality$/.test(x.id));s.planVersion=2;}return s}}catch(e){}return structuredClone(defaultState)}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.sessions)&&Array.isArray(s.activities)){s.profile=s.profile||{};if(s.profile.weight==null)s.profile.weight=77;if(s.profile.vo2==null)s.profile.vo2=56;if(s.profile.max==null)s.profile.max=199;if(s.profile.threshold==null)s.profile.threshold=175;if(s.profile.notes==null)s.profile.notes='Seuil actuel : 4:19/km à 175 bpm.';if(s.sessions.some(x=>!x.week))s.sessions=[];if(s.planVersion!==5){const cw=dateISO(monday(new Date()));s.sessions=s.sessions.filter(x=>x.done||!(/^\\d{4}-\\d{2}-\\d{2}-(quality|easy|tempo|long|swim)$/.test(x.id))||x.week!==cw);s.planVersion=5;}return s}}catch(e){}return structuredClone(defaultState)}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));showToast('Données enregistrées sur cet appareil');render()}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),1800)}
 const days=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
@@ -117,9 +117,9 @@ function createWeekSessions(key){
   t={title:'Footing facile + lignes droites',meta:'40–45 min à 135–150 bpm puis 6 × 20 s rapides mais relâchées, récupération complète en marchant/trottinant. Pas un deuxième entraînement dur.'};
   longTitle='Sortie longue facile · 1h20–1h25 · ~12–14 km';longMeta='1h20–1h25 · distance estimée 12–14 km à allure facile · 135–150 bpm, terrain facile et allure régulière. Tu dois finir avec de la marge.';
  } else if(weeksToRace===5){
-  q={title:'5 × 1 000 m · allure 10 km contrôlée',meta:'Échauffement 15 min à 135–150 bpm + 3 accélérations · 5 × 1 000 m vers 4:10–4:20/km, récupération 2 min en trot · retour au calme 10 min. FC attendue en hausse, souvent 176–184 en fin de répétition ; priorité à la régularité.'};
-  t={title:'2 × 15 min à allure semi',meta:'15 min faciles · 2 × 15 min vers 4:35–4:40/km, récupération 3 min en trot · 10 min faciles. Reste contrôlé, généralement 168–175 bpm ; si la FC dérive, ralentis.'};
-  longTitle='Sortie longue · 1h30 · ~14–15 km';longMeta='1h30 · distance estimée 14–15 km · 135–150 bpm, facile du début à la fin. Pas de finish rapide cette semaine.';
+  q={title:'3 × 2 km · allure semi contrôlée',meta:'Échauffement 15 min à 135–150 bpm + 3 accélérations · 3 × 2 km à 4:35–4:40/km, récupération 3 min en trot · retour au calme 10 min. Vise une allure régulière et 168–175 bpm au maximum en fin de répétition ; ne force pas si les jambes sont lourdes.'};
+  t={title:'Séance spécifique supprimée cette semaine',meta:'Après le 8 × 800 m de la semaine passée et la randonnée de près de 6 h avec 900 m D+ dimanche, on garde une seule séance de qualité. Pas besoin de compenser la sortie longue manquée.'};
+  longTitle='Sortie longue reprise · 1h25 · ~13–14 km';longMeta='1h25 · distance estimée 13–14 km · 135–150 bpm, terrain facile et effort régulier. La sortie longue manquée la semaine dernière n’est pas à rattraper : on reprend progressivement, sans accélération finale.';
  } else if(weeksToRace===4){
   q={title:'6 × 800 m · rapide et régulier',meta:'Échauffement 15 min à 135–150 bpm + 3 accélérations · 6 × 800 m vers 4:05–4:15/km, récupération 2 min en trot · retour au calme 10 min. 176–184 bpm peut être atteint en fin de répétition, sans sprint.'};
   t={title:'3 × 8 min au seuil contrôlé',meta:'15 min faciles · 3 × 8 min vers 4:20–4:30/km, récupération 2 min en trot · 10 min faciles. Vise 168–175 bpm, effort solide mais maîtrisé.'};
@@ -149,9 +149,9 @@ function createWeekSessions(key){
   }
  }
  const a=[
-  {id:key+'-quality',week:key,day:2,type:'Fractionné / spécifique',title:q.title,meta:q.meta,done:false},
-  {id:key+'-easy',week:key,day:4,type:'Endurance facile',title:easy.title,meta:easy.meta,done:false},
-  {id:key+'-tempo',week:key,day:6,type:'Allure spécifique / contrôle',title:t.title,meta:t.meta,done:false},
+  {id:key+'-quality',week:key,day:weeksToRace===5?4:2,type:'Allure spécifique / contrôle',title:q.title,meta:q.meta,done:false},
+  {id:key+'-easy',week:key,day:weeksToRace===5?2:4,type:'Endurance facile',title:easy.title,meta:easy.meta,done:false},
+  ...(weeksToRace===5?[]:[{id:key+'-tempo',week:key,day:6,type:'Allure spécifique / contrôle',title:t.title,meta:t.meta,done:false}]),
   {id:key+'-long',week:key,day:0,type:weeksToRace===1?'Course objectif':'Sortie longue',title:longTitle,meta:longMeta,done:false}
  ];
  a.forEach(s=>{if(s.id.endsWith('-quality')){s.priority=weeksToRace>=0?'P1':'P3';s.why=weeksToRace<0?'Après le semi, la priorité est la récupération. Reprends les séances intenses seulement lorsque les jambes ont retrouvé de bonnes sensations.':'Cette séance est le stimulus principal de la semaine pour développer la vitesse ou l’allure spécifique. Elle passe avant les séances faciles si ton temps est limité.';}else if(s.id.endsWith('-long')){s.priority=weeksToRace===1?'P1':weeksToRace>1?'P2':'P3';s.why=weeksToRace===1?'C’est ton objectif principal de la semaine : le semi-marathon. Pars prudemment et adapte l’allure aux sensations.':weeksToRace>1?'Elle développe l’endurance et la résistance à la fatigue. Garde un effort facile et raccourcis si la fatigue s’accumule.':'La récupération post-course est prioritaire : pas besoin de forcer pour respecter un volume.';}else if(s.id.endsWith('-tempo')){s.priority=weeksToRace>=2?'P2':'P3';s.why='Elle complète la séance principale en améliorant le contrôle d’allure et l’endurance à une intensité soutenue. Elle reste secondaire si tu es fatigué.';}else{s.priority='P3';s.why='Séance complémentaire pour accumuler du volume facile et récupérer. Si tu ne peux pas tout faire, tu peux la raccourcir ou la sauter sans chercher à la rattraper.';}});
