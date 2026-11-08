@@ -104,7 +104,7 @@ let state=load(),offset=0;
 function load(){try{return {...defaultState,...JSON.parse(localStorage.getItem(KEY)||"{}")}}catch(e){return {...defaultState}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));toast("Enregistré");render()}
 function toast(s){let t=document.getElementById("toast");t.textContent=s;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600)}
-function weekKey(){let d=monday(new Date());d.setDate(d.getDate()+offset*7);return iso(d)}
+function weekKey(){let d=monday(new Date());if(d<parseDate(W[0][0]))d=parseDate(W[0][0]);d.setDate(d.getDate()+offset*7);return iso(d)}
 function weekData(key){return W.find(w=>w[0]===key)}
 function makeSessions(w){if(!w)return[];const days=[2,4,6,0],types=["P1 · Qualité","P3 · Endurance","P2 · Spécifique / facile","P2 · Sortie longue"];return [3,5,7,9].map((idx,i)=>({id:w[0]+"-"+i,day:days[i],type:types[i],title:w[idx],meta:w[idx+1],priority:i===0?"P1":i===2?"P2":"P3"}))}
 function allSessions(key){let w=weekData(key);let arr=makeSessions(w);state.extras.filter(x=>x.week===key).forEach(x=>arr.push(x));return arr}
