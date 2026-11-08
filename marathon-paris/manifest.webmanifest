@@ -1,0 +1,10 @@
+{
+  "name": "Marathon de Paris 2027",
+  "short_name": "Marathon Paris",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f5f0",
+  "theme_color": "#15231d",
+  "icons": [{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
