@@ -29,7 +29,7 @@ const KEY="marathon-paris-cockpit-v2",W=[["2026-11-09","Base · consolidation","
 const days=["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
 const parseDate=s=>new Date(s+"T12:00:00");
 const fmt=d=>d.toLocaleDateString("fr-FR",{day:"2-digit",month:"short"}).replace(".","");
-const weekDays=[2,4,6,0],sessionIndexes=[3,5,7,9],priorities=["P1","P3","P2","P2"];
+const weekDays=[2,4,5,0],sessionIndexes=[3,5,7,9],priorities=["P1","P3","P2","P2"];
 let state=loadState();
 function loadState(){try{const old=JSON.parse(localStorage.getItem(KEY)||"{}");return {checks:old.checks||{}}}catch(e){return {checks:{}}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
